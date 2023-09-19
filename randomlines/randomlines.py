@@ -20,6 +20,7 @@ values = [20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,40, 41,
 button_y = -370
 wn = t.Screen()
 wn.setup(0.5,1.0)
+isDrawing = False
 
 #---------turtle setup
 
@@ -78,6 +79,8 @@ border.goto(-screen_size,screen_size + 20)
 #main generate function
 def design(x,y):
     start.color("red")
+    
+    
     ob.color(r.choice(colors))
     for i in range(200):
         clear.color("blue")
@@ -89,7 +92,8 @@ def design(x,y):
             ob.fd(r.randint(25,55))
             #ob.right(r.randint(40,140))
             ob.right(r.choice(values))
-    start.color("green")
+start.color("green")
+    
         
 #clears screen       
 def clear_screen(x,y):
