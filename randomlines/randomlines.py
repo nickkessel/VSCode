@@ -7,16 +7,19 @@ import random as r
 font_setup = ["Impact", 35, "normal"]
 screen_size = 350
 colors = ['white',
-    'black',
+    'salmon',
     'red',
     'green',
     'blue',
     'cyan',
-    'magenta',  # You can also use 'purple'
+    'magenta',  
     'yellow',
     'orange',
     'brown']
 values = [20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160]
+button_y = -370
+wn = t.Screen()
+wn.setup(0.5,1.0)
 
 #---------turtle setup
 
@@ -31,8 +34,8 @@ start = t.Turtle()
 start.shape("square")
 start.pu()
 start.speed(0)
-start.goto(0,-300)
-start.shapesize(4,12,1)
+start.goto(0,button_y)
+start.shapesize(3,10,1)
 start.color("green")
 
 #clear button
@@ -41,7 +44,7 @@ clear.shape("triangle")
 clear.pu()
 clear.speed(0)
 clear.seth(-90)
-clear.goto(-250,-287)
+clear.goto(-250,button_y + 7)
 clear.shapesize(4,4,1)
 clear.color("grey")
 
@@ -51,9 +54,9 @@ label.ht()
 label.pu()
 label.color("salmon")
 label.speed(0)
-label.goto(-295,-250)
+label.goto(-295,button_y - 100)
 label.write("clear", font = font_setup)
-label.goto(-85,-260)
+label.goto(-85,button_y - 100)
 label.write("generate", font = font_setup)
 
 #screen border
@@ -98,6 +101,5 @@ def clear_screen(x,y):
 start.onclick(design)
 clear.onclick(clear_screen)
 
-wn = t.Screen()
 wn.bgcolor("black")
 wn.mainloop()
