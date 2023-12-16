@@ -15,7 +15,7 @@ canvas.grid(row=0, column=1, rowspan=3)
 color_frame = tkinter.Canvas(root, background='#333333', width=500, height=60)
 color_frame.grid(row=4, column=1, rowspan=2)
 
-button_frame = tkinter.Frame(root)
+button_frame = tkinter.Frame(root, background='lightgray')
 button_frame.grid(row = 1, column= 0)
 
 # Create a list of circles on the canvas
@@ -55,20 +55,6 @@ def clear():
     shapes.clear()
     canvas.delete('all')
 
-#def save1():
-    print("save start")
-    canvas.postscript(file="drawing.eps")
-    from PIL import Image
-    
-    print("\n pil import image")
-    img = Image.open("drawing.eps")
-    
-    print("\n image open")
-    
-    img.save("drawing.png", "png")
-    print("\n success?")
-
-
 
 def save():
     print("\n start save")
@@ -87,16 +73,16 @@ def save():
     image.save("canvas.png")
     print("saved")
 
-clear_img = tkinter.PhotoImage(file="clear.png")
+clear_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/clear.png')
 clear_button = tkinter.Button(button_frame, image= clear_img, command=clear, width=100,
-                              fg= "red", height=50, background="white", activebackground= "red",
+                              fg= "red", background="white", activebackground= "red",
                               activeforeground="white")
 clear_button.pack(pady = 10)
 
-save_img = tkinter.PhotoImage(file="save.png")
+save_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/save.png')
 save_button = tkinter.Button(button_frame, image=save_img, command= save,
-                             width = 100, height = 50, activebackground= "cyan")
-#save_button.grid(column=0,row=3)
+                             width = 100, activebackground= "cyan")
+save_button.pack(pady=10)
 
 ########## Event handler for mouse clicks and recolor
 
