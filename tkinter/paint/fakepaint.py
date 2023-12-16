@@ -3,12 +3,14 @@ import tkinter
 import pyautogui
 import time
 
-#TODO: rebuild grid so that i can have 2 tool change buttons in the width of 1 other element like status text or clear/save buttons
-#TODO: make buttons for changing active tool
-#TODO: make icons for said new buttons
+#TODO s without the highlight are COMPLETE
+#TODO rebuild grid so that i can have 2 tool change buttons in the width of 1 other element like status text or clear/save buttons
+#TODO make buttons for changing active tool
+#TODO make icons for said new buttons !DONE
+#FIXME: redo icon for pen tool
 #TODO: change instuctions (maybe hover???)
-#TODO: delete the old keypress thing and update that in instructions
-#TODO: add frame system for tool change buttons
+#TODO delete the old keypress thing and update that in instructions
+#TODO add frame system for tool change buttons
 #TODO: rewrite save code so that the filename is the time of the save
 #TODO: mMAYBE rewrite save code so you can choose filepath
 #TODO: add pen tool for drawing (could be hard, but could then add width and all that kinda cool stuff (mouse scroll width???)) with cursor to reflect it (Change cursor size???)
@@ -19,16 +21,21 @@ root.configure(bg="lightgray")
 
 # Create a canvas and place it
 canvas = tkinter.Canvas(root, height=600, width=900, background='#FFFFFF')
-canvas.grid(row=0, column=1, rowspan=3)
+canvas.grid(row=0, column=2, rowspan=3)
 
 #create color frame
 color_frame = tkinter.Canvas(root, background='#333333', width=500, height=60)
-color_frame.grid(row=4, column=1, rowspan=2)
+color_frame.grid(row=4, column=2, rowspan=2)
 
-button_frame = tkinter.Frame(root, background='lightgray')
-button_frame.grid(row = 1, column= 0)
+#frame for clear save and future menu type buttons
+menu_button_frame = tkinter.Frame(root, background='lightgray')
+menu_button_frame.grid(row = 1, column= 0, columnspan=2)
 
-# Create a list of circles on the canvas
+#frame for buttons that change the current tool
+tool_button_frame = tkinter.Frame(root, background='#bbbbbb')
+tool_button_frame.grid(row=0, column= 0, columnspan=2, padx= 5)
+
+# Create a list of objects on the canvas
 shapes = []
 
 #list of colors
@@ -44,15 +51,15 @@ border_width = 1
 borderOn = True
 
 #Instructions for the user
-message = tkinter.Label(root, text='Drag mouse to create \n shape!\n r = rectangle \n c = circle \n right-click = recolor \n b = border \n middle-click = cycle colors', padx=20)
-message.grid(column=0, row=0)
+# message = tkinter.Label(root, text='Drag mouse to create \n shape!\n r = rectangle \n c = circle \n right-click = recolor \n b = border \n middle-click = cycle colors', padx=20)
+# message.grid(column=0, row=0, columnspan=2)
 
 #text with shape
 current_shape = tkinter.Label(root, text='Circle ', font=('Impact', 20 ))
-current_shape.grid(column=0, row=2)
+current_shape.grid(column=0, row=2, columnspan=2)
 
 current_border = tkinter.Label(root, text= "Border On", font=('Impact', 20))
-current_border.grid(column=0, row=2, sticky= tkinter.S)
+current_border.grid(column=0, row=2, sticky= tkinter.S, columnspan=2)
 
 highlight_square = color_frame.create_rectangle(5 + (color_int*50) ,5,45 + (color_int * 50),55, fill= '#aaaaaa')
 
@@ -83,16 +90,44 @@ def save():
     image.save("canvas.png")
     print("saved")
 
+def shape(type): # add 'event' param if turning on keyboard shortcuts
+    #print("hello")
+    global shape_type 
+    shape_type = type
+    print(shape_type)
+    
+    if shape_type == 0:
+        canvas.config(cursor="circle")
+        current_shape.config(text="Circle")
+    elif shape_type == 1:
+        canvas.config(cursor="dotbox")
+        current_shape.config(text="Rectangle")
+    elif shape_type == 2:
+        canvas.config(cursor= "pencil")
+        current_shape.config(text= "Pen Tool")
+        
 clear_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/clear.png')
-clear_button = tkinter.Button(button_frame, image= clear_img, command=clear, width=100,
+clear_button = tkinter.Button(menu_button_frame, image= clear_img, command=clear, width=100,
                               fg= "red", background="white", activebackground= "red",
                               activeforeground="white")
-clear_button.pack(pady = 10)
+clear_button.pack(pady = 10, padx =15)
 
 save_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/save.png')
-save_button = tkinter.Button(button_frame, image=save_img, command= save,
+save_button = tkinter.Button(menu_button_frame, image=save_img, command= save,
                              width = 100, activebackground= "cyan")
-save_button.pack(pady=10)
+save_button.pack()
+
+circ_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/circle_icon.png')
+circ_button = tkinter.Button(tool_button_frame, image = circ_img, text="circle", command= lambda: shape(0))
+circ_button.grid(row = 0, column=0, padx = 5, pady= 5)
+
+rect_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/rect_icon.png')
+rect_button = tkinter.Button(tool_button_frame, image= rect_img,text="rect", command= lambda: shape(1))
+rect_button.grid(row = 0, column = 1)
+
+pen_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/pen_icon.png')
+pen_button = tkinter.Button(tool_button_frame, image= pen_img, text="pen", command= lambda: shape(2))
+pen_button.grid(row=1, column=0, padx= 5, pady=5)
 
 ########## Event handler for mouse clicks and recolor
 
@@ -130,20 +165,7 @@ def border(event):
     elif borderOn == False:
         border_width = 0
         current_border.config(text = "Border Off")
-        
-
-def shape(event, type):
-    #print("hello")
-    global shape_type 
-    shape_type = type
-    print(shape_type)
     
-    if shape_type == 0:
-        canvas.config(cursor="circle")
-        current_shape.config(text="Circle")
-    elif shape_type == 1:
-        canvas.config(cursor="dotbox")
-        current_shape.config(text="Rectangle")
 
 def down(event):
     global startx, starty # Use global variables for assignment
@@ -176,11 +198,10 @@ def up(event):
     
 # Button press and release event
 
-
 canvas.bind('<Button-1>', down)
 canvas.bind('<ButtonRelease-1>', up)
-canvas.bind('<c>', lambda event: shape(event, 0))
-canvas.bind('<r>', lambda event: shape(event, 1))
+# canvas.bind('<c>', lambda event: shape(event, 0))
+# canvas.bind('<r>', lambda event: shape(event, 1))
 canvas.bind('<Button-2>', color_select)
 canvas.bind('<Button-3>', recolor)
 canvas.bind('<b>', border)
