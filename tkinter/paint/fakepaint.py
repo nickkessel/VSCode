@@ -3,6 +3,16 @@ import tkinter
 import pyautogui
 import time
 
+#TODO: rebuild grid so that i can have 2 tool change buttons in the width of 1 other element like status text or clear/save buttons
+#TODO: make buttons for changing active tool
+#TODO: make icons for said new buttons
+#TODO: change instuctions (maybe hover???)
+#TODO: delete the old keypress thing and update that in instructions
+#TODO: add frame system for tool change buttons
+#TODO: rewrite save code so that the filename is the time of the save
+#TODO: mMAYBE rewrite save code so you can choose filepath
+#TODO: add pen tool for drawing (could be hard, but could then add width and all that kinda cool stuff (mouse scroll width???)) with cursor to reflect it (Change cursor size???)
+
 root = tkinter.Tk()
 root.wm_title('Color-Shape Art Creation')
 root.configure(bg="lightgray")
