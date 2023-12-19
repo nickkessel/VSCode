@@ -2,6 +2,7 @@
 import tkinter
 import pyautogui
 import time
+from PIL import Image
 
 #TODO s without the highlight are COMPLETE
 #TODO rebuild grid so that i can have 2 tool change buttons in the width of 1 other element like status text or clear/save buttons
@@ -14,6 +15,8 @@ import time
 #TODO: rewrite save code so that the filename is the time of the save
 #TODO: mMAYBE rewrite save code so you can choose filepath
 #TODO: add pen tool for drawing (could be hard, but could then add width and all that kinda cool stuff (mouse scroll width???)) with cursor to reflect it (Change cursor size???)
+#TODO: fix colors so there is more variety / usefullness
+#TODO: mouse scroll wheel for color change?
 
 root = tkinter.Tk()
 root.wm_title('Color-Shape Art Creation')
@@ -38,13 +41,15 @@ tool_button_frame.grid(row=0, column= 0, columnspan=2, padx= 5)
 # Create a list of objects on the canvas
 shapes = []
 
+resized_img_button = (40,40) #resize icons
+
 #list of colors
 colorsList = ['red', 'yellow', 'blue', 'green', 'brown', 'cyan', 'violet', 'magenta', 
         'orange', 'darkgray']
 
 #set default cursor to circle
 canvas.config(cursor="circle")
-#set default shape to circle
+#set default shape to oval
 color_int = 0
 shape_type = 0
 border_width = 1
@@ -55,7 +60,7 @@ borderOn = True
 # message.grid(column=0, row=0, columnspan=2)
 
 #text with shape
-current_shape = tkinter.Label(root, text='Circle ', font=('Impact', 20 ))
+current_shape = tkinter.Label(root, text='Oval ', font=('Impact', 20 ))
 current_shape.grid(column=0, row=2, columnspan=2)
 
 current_border = tkinter.Label(root, text= "Border On", font=('Impact', 20))
@@ -98,13 +103,16 @@ def shape(type): # add 'event' param if turning on keyboard shortcuts
     
     if shape_type == 0:
         canvas.config(cursor="circle")
-        current_shape.config(text="Circle")
+        current_shape.config(text="Oval")
     elif shape_type == 1:
         canvas.config(cursor="dotbox")
         current_shape.config(text="Rectangle")
     elif shape_type == 2:
         canvas.config(cursor= "pencil")
         current_shape.config(text= "Pen Tool")
+    elif shape_type == 3:
+        canvas.config(cursor="circle")
+        current_shape.config(text="Circle")
         
 clear_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/clear.png')
 clear_button = tkinter.Button(menu_button_frame, image= clear_img, command=clear, width=100,
@@ -117,17 +125,21 @@ save_button = tkinter.Button(menu_button_frame, image=save_img, command= save,
                              width = 100, activebackground= "cyan")
 save_button.pack()
 
-circ_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/circle_icon.png')
-circ_button = tkinter.Button(tool_button_frame, image = circ_img, text="circle", command= lambda: shape(0))
-circ_button.grid(row = 0, column=0, padx = 5, pady= 5)
+oval_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/oval_icon.png')
+oval_button = tkinter.Button(tool_button_frame, image = oval_img, text="oval", command= lambda: shape(0))
+oval_button.grid(row = 0, column=0, padx = 5, pady= 5)
 
-rect_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/rect_icon.png')
+rect_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/rect_icon2.png')
 rect_button = tkinter.Button(tool_button_frame, image= rect_img,text="rect", command= lambda: shape(1))
 rect_button.grid(row = 0, column = 1)
 
-pen_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/pen_icon.png')
+pen_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/pen_icon2.png')
 pen_button = tkinter.Button(tool_button_frame, image= pen_img, text="pen", command= lambda: shape(2))
 pen_button.grid(row=1, column=0, padx= 5, pady=5)
+
+circle_img = tkinter.PhotoImage(file='C:/Users/nickk/Documents/VSCode/tkinter/paint/circle_icon2.png')
+circle_button = tkinter.Button(tool_button_frame, image= circle_img, text="Circle", command= lambda: shape(3))
+circle_button.grid(row=1, column=1, padx = 5, pady = 5)
 
 ########## Event handler for mouse clicks and recolor
 
@@ -172,7 +184,7 @@ def down(event):
     startx = event.x # Store the mouse down coordinates in the global variables
     starty = event.y
     
-def up(event):
+def up(event): # thing that do the drawing
     global color_int
     global shape_type
     global border_width
@@ -184,7 +196,7 @@ def up(event):
     endy = event.y
     
     if shape_type == 0:
-        print("circle") 
+        print("oval") 
         #new_shape = canvas.create_oval(startx-r, starty-r, startx+r, starty+r,
         #outline='#000000', fill=colorsList[color_int])
         shapes.append(canvas.create_oval(startx, starty, endx, endy,
@@ -193,6 +205,12 @@ def up(event):
         print("rect") 
         shapes.append(canvas.create_rectangle(startx, starty, endx, endy,
         outline='#000000', fill= colorsList[color_int], width= border_width))
+    elif shape_type == 2:
+        print("pen tool")
+    elif shape_type == 3:
+        print("circle")
+        shapes.append(canvas.create_oval(startx, starty, startx + r, starty + r,
+            outline='#000000', fill=colorsList[color_int], width= border_width))
  # aggregate the canvas' item
     #print(shapes)
     
