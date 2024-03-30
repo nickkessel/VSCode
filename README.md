@@ -1,2 +1,2 @@
 # VSCode
-Everything I code in Visual Studio, I guess...
+what i do
