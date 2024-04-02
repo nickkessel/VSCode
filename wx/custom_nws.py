@@ -12,7 +12,9 @@ current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observat
 i_json = init_call.json()
 forecast_url = i_json['properties']['forecast']
 hourly_url = i_json['properties']['forecastHourly']
+alert_zone = i_json['properties']['forecastZone']
 
+alerts_url = requests.get('https://api.weather.gov/alerts/active?zone=' + alert_zone)
 forecast = requests.get(forecast_url)
 forecast_hourly = requests.get(hourly_url)
 alerts = requests.get('https://api.weather.gov/alerts/active/area/OH')
@@ -28,6 +30,8 @@ eastern_timezone = pytz.timezone('America/New_York')
 c_json = current.json() #most recent hour observation from WFO
 f_json = forecast.json() #2-a-day forecast for given lat/lon and WFO
 a_json = alerts.json() #current alerts for given state
+
+print(a_json['features'][0]['properties']['event'])
 
 def convert(val, type): #converts various metric values into imperial ones
     if type == 'c': #celsius to fahrentheit
