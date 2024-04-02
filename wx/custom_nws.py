@@ -4,10 +4,17 @@ import pytz
 from pytz import timezone
 
 # station = input('\nChoose station (KILN,KIWX,KGRR, etc): ')
-lat = 39
-lon = 84
+lat = 39.10 #can replace these with any lat/lon
+lon = -84.1735
+init_call = requests.get('https://api.weather.gov/points/' + str(lat) + ',' + str(lon)) 
 current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observations')
-forecast = requests.get('https://api.weather.gov/gridpoints/' + 'ILN/' + str(lat) + ',' + str(lon) + '/forecast')
+
+i_json = init_call.json()
+forecast_url = i_json['properties']['forecast']
+hourly_url = i_json['properties']['forecastHourly']
+
+forecast = requests.get(forecast_url)
+forecast_hourly = requests.get(hourly_url)
 alerts = requests.get('https://api.weather.gov/alerts/active/area/OH')
 
 utc_format = "%Y-%m-%d %H:%M:%S"
@@ -62,7 +69,7 @@ daily_or_hourly = input("Daily Forecast (d) or Hourly Forecast (h)? : ")
 print('Latest Obs: (' + utc_breakdown(time) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
 
 if daily_or_hourly == 'd':
-    for x in range(12): #twelve day segments/ day and night
+    for x in range(14): #twelve day segments/ day and night
         temp = f_json["properties"]['periods'][x]['temperature']
         when = f_json['properties']['periods'][x]['name']
         desc = f_json['properties']['periods'][x]['detailedForecast']
