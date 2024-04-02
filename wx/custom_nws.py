@@ -8,6 +8,7 @@ lat = 39
 lon = 84
 current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observations')
 forecast = requests.get('https://api.weather.gov/gridpoints/' + 'ILN/' + str(lat) + ',' + str(lon) + '/forecast')
+alerts = requests.get('https://api.weather.gov/alerts/active/area/OH')
 
 utc_format = "%Y-%m-%d %H:%M:%S"
 
@@ -19,10 +20,20 @@ eastern_timezone = pytz.timezone('America/New_York')
 
 c_json = current.json() #most recent hour observation from WFO
 f_json = forecast.json() #2-a-day forecast for given lat/lon and WFO
+a_json = alerts.json() #current alerts for given state
 
-def ctf(c_val): #converts celsius to fahrenheit, and returns as a STRING
-    f_val = (c_val * 1.8) + 32
-    return str(f_val)
+def convert(val, type): #converts various metric values into imperial ones
+    if type == 'c': #celsius to fahrentheit
+        f_val = round((val * 1.8) + 32, 1)
+        return(f_val)
+    elif type == 'kmh': #kmh to mph
+        mph_val = round((val / 1.609), 1)
+        return(mph_val)
+    elif type == 'pa': #converts pascals to mb/hpa
+        hpa_val = round((val/100), 2)
+        return(hpa_val)
+    else:
+        return('Oh no! conversion error...')
 
 
 def utc_breakdown(utc_time_str):
@@ -39,12 +50,25 @@ def utc_breakdown(utc_time_str):
 
 
 time = c_json["features"][0]["properties"]['timestamp']
-c_temp = ctf(c_json["features"][0]["properties"]['temperature']['value']) #current temp
+c_cond = c_json["features"][0]["properties"]['textDescription'] #current conditions
+c_wind = convert((c_json["features"][0]["properties"]['windSpeed']['value']), 'kmh') #current wind speed
+c_dew = convert((c_json["features"][0]["properties"]['dewpoint']['value']), 'c')
+# c_gust = convert((c_json["features"][0]["properties"]['windGust']['value']), 'kmh') #current wind gust (not working bc sometimes it is null and i dont want to fix it rn)
+c_temp = convert((c_json["features"][0]["properties"]['temperature']['value']), 'c') #current temp
+c_pressure = convert((c_json["features"][0]["properties"]['barometricPressure']['value']), 'pa') #current baro pressure
 
-print('Latest Obs: (' + utc_breakdown(time) +') ' + c_temp + 'f \n')
-for x in range(12):
-    temp = f_json["properties"]['periods'][x]['temperature']
-    when = f_json['properties']['periods'][x]['name']
-    desc = f_json['properties']['periods'][x]['detailedForecast']
-    
-    print(when + " temp " + str(temp) + "  " + desc + '\n')
+daily_or_hourly = input("Daily Forecast (d) or Hourly Forecast (h)? : ")
+
+print('Latest Obs: (' + utc_breakdown(time) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
+
+if daily_or_hourly == 'd':
+    for x in range(12): #twelve day segments/ day and night
+        temp = f_json["properties"]['periods'][x]['temperature']
+        when = f_json['properties']['periods'][x]['name']
+        desc = f_json['properties']['periods'][x]['detailedForecast']
+        
+        print(when + " temp " + str(temp) + "  " + desc + '\n')
+elif daily_or_hourly == 'h':
+    print('hourly')
+else:
+    print("ERROR!!!!!")
