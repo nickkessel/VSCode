@@ -6,18 +6,25 @@ from pytz import timezone
 # station = input('\nChoose station (KILN,KIWX,KGRR, etc): ')
 lat = 39.10 #can replace these with any lat/lon
 lon = -84.1735
-init_call = requests.get('https://api.weather.gov/points/' + str(lat) + ',' + str(lon)) 
+
+init_url = 'https://api.weather.gov/points/' + str(lat) + ',' + str(lon)
+print(init_url)
+init_call = requests.get(init_url)
+i_json = init_call.json() # initial call to get the grid points for forecast data in certain WFO
+
 current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observations')
 
-i_json = init_call.json()
 forecast_url = i_json['properties']['forecast']
+print(forecast_url)
 hourly_url = i_json['properties']['forecastHourly']
-alert_zone = i_json['properties']['forecastZone']
+alert_zone = i_json['properties']['forecastZone'] # returns omethings like 'https://api.weather.gov/zones/forecast/OHZ078', i need to take off everything before the /zone-id part
 
-alerts_url = requests.get('https://api.weather.gov/alerts/active?zone=' + alert_zone)
+alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone
+print(alerts_url)
+
+alerts = requests.get(alert_zone)
 forecast = requests.get(forecast_url)
 forecast_hourly = requests.get(hourly_url)
-alerts = requests.get('https://api.weather.gov/alerts/active/area/OH')
 
 utc_format = "%Y-%m-%d %H:%M:%S"
 
