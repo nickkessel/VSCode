@@ -4,8 +4,8 @@ import pytz
 from pytz import timezone
 
 # station = input('\nChoose station (KILN,KIWX,KGRR, etc): ')
-lat = 39.10 #can replace these with any lat/lon
-lon = -84.1735
+lat = 44.478        #39.167 #can replace these with any lat/lon
+lon = -71.192   #-84.293
 
 init_url = 'https://api.weather.gov/points/' + str(lat) + ',' + str(lon)
 print(init_url)
@@ -17,12 +17,14 @@ current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observat
 forecast_url = i_json['properties']['forecast']
 print(forecast_url)
 hourly_url = i_json['properties']['forecastHourly']
-alert_zone = i_json['properties']['forecastZone'] # returns omethings like 'https://api.weather.gov/zones/forecast/OHZ078', i need to take off everything before the /zone-id part
+alert_zone = i_json['properties']['forecastZone'] # returns omethings like 'https://api.weather.gov/zones/forecast/OHZ078'
 
-alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone
-print(alerts_url)
+alert_zone = alert_zone.replace('https://api.weather.gov/zones/forecast/','') #replaces uneccsary part with nothing
 
-alerts = requests.get(alert_zone)
+alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone #appends zone code to the alert url
+print(alerts_url) 
+
+alerts = requests.get(alerts_url)
 forecast = requests.get(forecast_url)
 forecast_hourly = requests.get(hourly_url)
 
@@ -38,7 +40,6 @@ c_json = current.json() #most recent hour observation from WFO
 f_json = forecast.json() #2-a-day forecast for given lat/lon and WFO
 a_json = alerts.json() #current alerts for given state
 
-print(a_json['features'][0]['properties']['event'])
 
 def convert(val, type): #converts various metric values into imperial ones
     if type == 'c': #celsius to fahrentheit
@@ -75,18 +76,28 @@ c_dew = convert((c_json["features"][0]["properties"]['dewpoint']['value']), 'c')
 c_temp = convert((c_json["features"][0]["properties"]['temperature']['value']), 'c') #current temp
 c_pressure = convert((c_json["features"][0]["properties"]['barometricPressure']['value']), 'pa') #current baro pressure
 
-daily_or_hourly = input("Daily Forecast (d) or Hourly Forecast (h)? : ")
 
-print('Latest Obs: (' + utc_breakdown(time) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
+info_selector = input("Daily Forecast (d) | Hourly Forecast (h) | Active Alerts (a) : ")
 
-if daily_or_hourly == 'd':
+print('\nLatest Obs: (' + utc_breakdown(time) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
+
+if info_selector == 'd':
     for x in range(14): #twelve day segments/ day and night
         temp = f_json["properties"]['periods'][x]['temperature']
         when = f_json['properties']['periods'][x]['name']
         desc = f_json['properties']['periods'][x]['detailedForecast']
         
         print(when + " temp " + str(temp) + "  " + desc + '\n')
-elif daily_or_hourly == 'h':
+elif info_selector == 'h':
     print('hourly')
+elif info_selector == 'a':
+    alert_count = len(a_json['features'])
+    print('alert count: ' + str(alert_count))
+
+    if alert_count != 0: #if there are alerts
+        for x in range(alert_count): #cycle thru list of alerts
+            alert_headline = (a_json['features'][x]['properties']['headline']) #alert headline, with issue date and expiry time
+            alert_desc = (a_json['features'][x]['properties']['description']) #details about impacts, etc...
+            print(alert_headline + '\n' + alert_desc + '\n')
 else:
     print("ERROR!!!!!")
