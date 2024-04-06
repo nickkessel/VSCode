@@ -4,8 +4,8 @@ import pytz
 from pytz import timezone
 
 # station = input('\nChoose station (KILN,KIWX,KGRR, etc): ')
-lat = 44.478        #39.167 #can replace these with any lat/lon
-lon = -71.192   #-84.293
+lat = 39.167 #can replace these with any lat/lon
+lon = -84.293
 
 init_url = 'https://api.weather.gov/points/' + str(lat) + ',' + str(lon)
 print(init_url)
@@ -19,12 +19,7 @@ print(forecast_url)
 hourly_url = i_json['properties']['forecastHourly']
 alert_zone = i_json['properties']['forecastZone'] # returns omethings like 'https://api.weather.gov/zones/forecast/OHZ078'
 
-alert_zone = alert_zone.replace('https://api.weather.gov/zones/forecast/','') #replaces uneccsary part with nothing
 
-alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone #appends zone code to the alert url
-print(alerts_url) 
-
-alerts = requests.get(alerts_url)
 forecast = requests.get(forecast_url)
 forecast_hourly = requests.get(hourly_url)
 
@@ -38,7 +33,6 @@ eastern_timezone = pytz.timezone('America/New_York')
 
 c_json = current.json() #most recent hour observation from WFO
 f_json = forecast.json() #2-a-day forecast for given lat/lon and WFO
-a_json = alerts.json() #current alerts for given state
 
 
 def convert(val, type): #converts various metric values into imperial ones
@@ -91,6 +85,13 @@ if info_selector == 'd':
 elif info_selector == 'h':
     print('hourly')
 elif info_selector == 'a':
+    alert_zone = alert_zone.replace('https://api.weather.gov/zones/forecast/','') #replaces uneccsary part with nothing
+    alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone #appends zone code to the alert url
+    print(alerts_url)   
+    alerts = requests.get(alerts_url)
+    a_json = alerts.json() #current alerts for given alert zone
+
+    
     alert_count = len(a_json['features'])
     print('alert count: ' + str(alert_count))
 
