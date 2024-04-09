@@ -17,6 +17,7 @@ current = requests.get('https://api.weather.gov/stations/' + 'KILN' + '/observat
 forecast_url = i_json['properties']['forecast']
 print(forecast_url)
 hourly_url = i_json['properties']['forecastHourly']
+print(hourly_url)
 alert_zone = i_json['properties']['forecastZone'] # returns omethings like 'https://api.weather.gov/zones/forecast/OHZ078'
 
 
@@ -33,7 +34,7 @@ eastern_timezone = pytz.timezone('America/New_York')
 
 c_json = current.json() #most recent hour observation from WFO
 f_json = forecast.json() #2-a-day forecast for given lat/lon and WFO
-
+h_json = forecast_hourly.json()
 
 def convert(val, type): #converts various metric values into imperial ones
     if type == 'c': #celsius to fahrentheit
@@ -49,17 +50,26 @@ def convert(val, type): #converts various metric values into imperial ones
         return('Oh no! conversion error...')
 
 
-def utc_breakdown(utc_time_str):
-    formatted_time = utc_time_str.replace("+00:00", "") #replace +00:00 with nothing
-    formatted_time = formatted_time.replace("T", " ") #replace T with a space
-    utc_time = datetime.strptime(formatted_time, utc_format)
+def time_formatter(init_time_str, type):
     
-    edt_time = utc_timezone.localize(utc_time).astimezone(eastern_timezone)
+    if type == 0: #format from utc time
+        formatted_time = init_time_str.replace("+00:00", "") #replace +00:00 with nothing
+        formatted_time = formatted_time.replace("T", " ") #replace T with a space
+        utc_time = datetime.strptime(formatted_time, utc_format)
+        
+        edt_time = utc_timezone.localize(utc_time).astimezone(eastern_timezone)
 
-    # Format the EDT time as string
-    edt_format = "%Y-%m-%d %H:%M:%S"
-    edt_time_str = edt_time.strftime(edt_format)
-    return(edt_time_str)
+        # Format the EDT time as string
+        edt_format = "%Y-%m-%d %H:%M:%S"
+        edt_time_str = edt_time.strftime(edt_format)
+        return(edt_time_str)
+    elif type == 1: #if time string is already in edt, then remove extra stuff, and remove the year and seconds at the end
+        formatted_time = init_time_str.replace("-04:00", "") #replace +00:00 with nothing
+        formatted_time = formatted_time.replace("T", " ") #replace T with a space
+        formatted_time = formatted_time.replace("2024-", "") #replace T with a space
+        formatted_time = formatted_time.replace(":00  ", " ") #replace T with a space
+
+        return(formatted_time)
 
 
 time = c_json["features"][0]["properties"]['timestamp']
@@ -73,7 +83,7 @@ c_pressure = convert((c_json["features"][0]["properties"]['barometricPressure'][
 
 info_selector = input("Daily Forecast (d) | Hourly Forecast (h) | Active Alerts (a) : ")
 
-print('\nLatest Obs: (' + utc_breakdown(time) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
+print('\nLatest Obs: (' + time_formatter(time, 0) +') ' + c_cond + ' | ' +str(c_temp) + 'f | DP: '+ str(c_dew) + 'f | ' + str(c_wind) + 'mph | ' + str(c_pressure) + 'mb\n')
 
 if info_selector == 'd':
     for x in range(14): #twelve day segments/ day and night
@@ -84,6 +94,12 @@ if info_selector == 'd':
         print(when + " temp " + str(temp) + "  " + desc + '\n')
 elif info_selector == 'h':
     print('hourly')
+    hourly_range = len(h_json['properties']['periods'])
+    for x in range(hourly_range):
+        h_starthour = time_formatter(h_json['properties']['periods'][x]['startTime'], 1)
+        h_temp = h_json['properties']['periods'][x]['temperature']
+        print(h_starthour + '  ' + str(h_temp))
+    
 elif info_selector == 'a':
     alert_zone = alert_zone.replace('https://api.weather.gov/zones/forecast/','') #replaces uneccsary part with nothing
     alerts_url = 'https://api.weather.gov/alerts/active?zone=' + alert_zone #appends zone code to the alert url
