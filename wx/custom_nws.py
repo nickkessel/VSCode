@@ -64,12 +64,12 @@ def time_formatter(init_time_str, type):
         edt_time_str = edt_time.strftime(edt_format)
         return(edt_time_str)
     elif type == 1: #if time string is already in edt, then remove extra stuff, and remove the year and seconds at the end
-        formatted_time = init_time_str.replace("-04:00", "") #replace +00:00 with nothing
+        formatted_time = init_time_str.replace("-04:00", "d") #replace +00:00 with nothing, and add a d to be deleted later
         formatted_time = formatted_time.replace("T", " ") #replace T with a space
-        formatted_time = formatted_time.replace("2024-", "") #replace T with a space
-        formatted_time = formatted_time.replace(":00  ", " ") #replace T with a space
+        formatted_time = formatted_time.replace("2024-", "") #take off the year as its kinda irrelevant
+        final_time = formatted_time.replace(":00d", "") #take off the seconds as theyll always be :00, d is there to signify its the end of the timestring
 
-        return(formatted_time)
+        return(final_time)
 
 
 time = c_json["features"][0]["properties"]['timestamp']
