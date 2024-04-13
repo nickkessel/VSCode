@@ -1,8 +1,8 @@
 import requests
-from datetime import datetime
+from datetime import datetime, date
+import calendar
 import pytz
-from pytz import timezone
-
+import pandas as pd
 # station = input('\nChoose station (KILN,KIWX,KGRR, etc): ')
 lat = 39.167 #can replace these with any lat/lon
 lon = -84.293
@@ -70,6 +70,10 @@ def time_formatter(init_time_str, type):
         final_time = formatted_time.replace(":00d", "") #take off the seconds as theyll always be :00, d is there to signify its the end of the timestring
 
         return(final_time)
+    elif type == 2: #used to get only yyyy-mm-dd, for example, for date to weekday conversion
+        ymd_time = init_time_str.split("T")
+        return ymd_time[0]
+        
 
 
 time = c_json["features"][0]["properties"]['timestamp']
@@ -97,8 +101,13 @@ elif info_selector == 'h':
     hourly_range = len(h_json['properties']['periods'])
     for x in range(hourly_range):
         h_starthour = time_formatter(h_json['properties']['periods'][x]['startTime'], 1)
+        
+        time_object_thing = pd.Timestamp(time_formatter(h_json['properties']['periods'][x]['startTime'], 2)) #converts the date formatted like YYYY-MM-DD into a timestamp object
+        h_startday = calendar.day_name[time_object_thing.weekday()] # gets day name from timestamp object (0= monday, 1 =- tuesday and so on)
+        
         h_temp = h_json['properties']['periods'][x]['temperature']
-        print(h_starthour + '  ' + str(h_temp))
+        
+        print(h_startday + ' ' + h_starthour + '  ' + str(h_temp))
     
 elif info_selector == 'a':
     alert_zone = alert_zone.replace('https://api.weather.gov/zones/forecast/','') #replaces uneccsary part with nothing
