@@ -78,7 +78,8 @@ def time_formatter(init_time_str, type):
 
 time = c_json["features"][0]["properties"]['timestamp']
 c_cond = c_json["features"][0]["properties"]['textDescription'] #current conditions
-c_wind = convert((c_json["features"][0]["properties"]['windSpeed']['value']), 'kmh') #current wind speed
+#c_wind = convert((c_json["features"][0]["properties"]['windSpeed']['value']), 'kmh') #current wind speed
+c_wind = 10
 c_dew = convert((c_json["features"][0]["properties"]['dewpoint']['value']), 'c')
 # c_gust = convert((c_json["features"][0]["properties"]['windGust']['value']), 'kmh') #current wind gust (not working bc sometimes it is null and i dont want to fix it rn)
 c_temp = convert((c_json["features"][0]["properties"]['temperature']['value']), 'c') #current temp
