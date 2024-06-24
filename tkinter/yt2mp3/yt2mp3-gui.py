@@ -8,6 +8,7 @@ import tkinter
 from tkinter import font
 import threading
 import time
+import music_tag
 
 counter = 0
 root = tkinter.Tk()
@@ -62,7 +63,9 @@ def dl_playlist():
             new_file = mp.AudioFileClip(mp4_path)
             new_file.write_audiofile(mp3_path)
             os.remove(mp4_path)
-            #counter2 = counter2 + 1
+            file_to_edit = music_tag.load_file(mp3_path)
+            file_to_edit['artist'] = 'test'
+            
 
 def get_playlist_data():
     ytlink = text_input.get("1.0",'end-1c')
@@ -73,10 +76,10 @@ def get_playlist_data():
     while True:
         time.sleep(1)
         global counter
-        amount_text.config(text= 'downloading ' + str(counter) + ' of ' + str(playlist.length))
+        amount_text.config(text= 'processing ' + str(counter) + ' of ' + str(playlist.length))
         
         if counter == playlist.length:
-            amount_text.config(text= 'download complete!')
+            amount_text.config(text= 'processing complete, please see console')
 
     
     
