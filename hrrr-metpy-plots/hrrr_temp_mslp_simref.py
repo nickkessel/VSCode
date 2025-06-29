@@ -1,4 +1,5 @@
 #-------TODOS:-------
+#SEEEE NEW VERSION ON LAPTOP!!!
 #option to toggle absolute (pivotal-like scale for temps) or relative colormap
 #going off #1 here... custom temps colortable
 #option to set forecast hour
