@@ -1,0 +1,8 @@
+DAY,d1,d2,d3,d4,d5,d6,d7
+HIGHTEMP,89,88,78,77,82,82,82
+LOWTEMP,69,67,57,57,62,61,63
+POP,0,60,40,0,30,0,0
+ICON,sun,rain,sunrain,cloud,msun,pcloud,psun
+DESC,Sunny Skies,Slight Chance Rain Showers,Mostly Cloudy  CHC PM Rain,Partly Sunny,CHC Rain Showers,Partly Cloudy,Partly Sunny
+WIND,Variable @ 5-10mph G20,,,,,,
+AVG,84/61F,,,,,,
